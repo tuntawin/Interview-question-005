@@ -10,8 +10,15 @@ public static class QueueEndpoints
 
         group.MapPost("/generate", async (IQueueService queueService, CancellationToken cancellationToken) =>
         {
-            var result = await queueService.GenerateNextQueueAsync(cancellationToken);
-            return Results.Ok(result);
+            try
+            {
+                var result = await queueService.GenerateNextQueueAsync(cancellationToken);
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(detail: ex.Message, statusCode: 500);
+            }
         })
         .WithName("GenerateQueue")
         .WithSummary("Generate Next Queue Ticket")
@@ -19,8 +26,15 @@ public static class QueueEndpoints
 
         group.MapPost("/reset", async (IQueueService queueService, CancellationToken cancellationToken) =>
         {
-            var result = await queueService.ResetQueueAsync(cancellationToken);
-            return Results.Ok(result);
+            try
+            {
+                var result = await queueService.ResetQueueAsync(cancellationToken);
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(detail: ex.Message, statusCode: 500);
+            }
         })
         .WithName("ResetQueue")
         .WithSummary("Reset Queue Index")
@@ -28,8 +42,15 @@ public static class QueueEndpoints
 
         group.MapGet("/current", async (IQueueService queueService, CancellationToken cancellationToken) =>
         {
-            var result = await queueService.GetCurrentQueueAsync(cancellationToken);
-            return Results.Ok(result);
+            try
+            {
+                var result = await queueService.GetCurrentQueueAsync(cancellationToken);
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(detail: ex.Message, statusCode: 500);
+            }
         })
         .WithName("GetCurrentQueue")
         .WithSummary("Get Current Queue Ticket")
