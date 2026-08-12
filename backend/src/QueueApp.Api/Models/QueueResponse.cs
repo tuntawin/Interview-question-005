@@ -10,3 +10,10 @@ public record QueueResetResponse(
     string Message,
     int CurrentIndex
 );
+
+public record QueueCurrentResponse(
+    string QueueCode,
+    int CurrentIndex,
+    DateTime? LastActive
+);
+

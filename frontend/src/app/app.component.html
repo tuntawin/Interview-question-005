@@ -1,78 +1,103 @@
 <div class="page-container">
   <div class="card">
-    <!-- Top green border bar (Border Top ~15px) -->
-    <div class="card-top-bar"></div>
+    @if (errorMessage()) {
+      <div class="error-banner">
+        {{ errorMessage() }}
+      </div>
+    }
 
-    <div class="card-content">
-      @if (errorMessage()) {
-        <div class="error-banner">
-          {{ errorMessage() }}
+    @if (currentScreen() === 1) {
+      <!-- Screen 1 (IT 05-1): Main Ticket Generation Screen -->
+      <div class="card-top-bar">
+        <span class="screen-title">IT 05-1</span>
+      </div>
+
+      <div class="card-content screen-1">
+        <div class="center-section">
+          <button 
+            type="button" 
+            class="btn btn-primary btn-get-ticket" 
+            [disabled]="isLoading()" 
+            (click)="generateQueue()">
+            @if (isLoading()) {
+              <span class="spinner"></span>
+              <span>กำลังโหลด...</span>
+            } @else {
+              <span>รับบัตรคิว</span>
+            }
+          </button>
         </div>
-      }
 
-      @if (currentScreen() === 1) {
-        <!-- Screen 1 (IT 05-1): Main Queue Ticket Generation Screen -->
-        <div class="screen screen-1">
-          <div class="center-section">
-            <button 
-              type="button" 
-              class="btn btn-primary btn-large" 
-              [disabled]="isLoading()" 
-              (click)="generateQueue()">
-              @if (isLoading()) {
-                <span class="spinner"></span>
-                <span>Loading...</span>
-              } @else {
-                <span>Get Ticket</span>
-              }
-            </button>
-          </div>
-
-          <div class="bottom-section">
-            <button 
-              type="button" 
-              class="btn btn-secondary btn-small" 
-              [disabled]="isLoading()" 
-              (click)="resetQueue()">
-              Reset Queue
-            </button>
-          </div>
+        <div class="bottom-section">
+          <button 
+            type="button" 
+            class="btn btn-secondary btn-reset-small" 
+            [disabled]="isLoading()" 
+            (click)="goToScreen3()">
+            ล้างคิว
+          </button>
         </div>
-      } @else if (currentScreen() === 2) {
-        <!-- Screen 2 (IT 05-2): Queue Ticket Number Display Screen -->
-        <div class="screen screen-2">
-          <div class="center-section">
-            <p class="queue-label">Queue Number</p>
-            <h1 class="queue-code-display">{{ queueCode() }}</h1>
-          </div>
+      </div>
+    } @else if (currentScreen() === 2) {
+      <!-- Screen 2 (IT 05-2): Ticket Display Screen -->
+      <div class="card-top-bar">
+        <span class="screen-title">IT 05-2</span>
+      </div>
 
-          <div class="bottom-section">
-            <button 
-              type="button" 
-              class="btn btn-outline" 
-              (click)="goToScreen1()">
-              Back to Main Screen
-            </button>
+      <div class="card-content screen-2">
+        <div class="center-section">
+          <div class="queue-label">หมายเลขคิว</div>
+          <div class="queue-code-display">{{ queueCode() }}</div>
+          <div class="timestamp-display">
+            วันที่ : {{ formattedDate() }} เวลา {{ formattedTime() }} น.
           </div>
         </div>
-      } @else if (currentScreen() === 3) {
-        <!-- Screen 3 (IT 05-3): Queue Reset Confirmation Screen -->
-        <div class="screen screen-3">
-          <div class="center-section">
-            <p class="queue-label">Current Queue Number</p>
-            <h1 class="queue-code-muted">00</h1>
-          </div>
 
-          <div class="bottom-section">
-            <button 
-              type="button" 
-              class="btn btn-outline" 
-              (click)="goToScreen1()">
-              Back to Main Screen
-            </button>
-          </div>
+        <div class="bottom-section">
+          <button 
+            type="button" 
+            class="btn btn-primary btn-action-back" 
+            (click)="goToScreen1()">
+            กลับไปหน้ารับบัตรคิว
+          </button>
         </div>
-      }
-    </div>
+      </div>
+    } @else if (currentScreen() === 3) {
+      <!-- Screen 3 (IT 05-3): Reset Queue Screen -->
+      <div class="card-top-bar">
+        <span class="screen-title">IT 05-3</span>
+      </div>
+
+      <div class="card-content screen-3">
+        <div class="top-action-section">
+          <button 
+            type="button" 
+            class="btn btn-primary btn-reset-top" 
+            [disabled]="isLoading()" 
+            (click)="resetQueue()">
+            @if (isLoading()) {
+              <span class="spinner"></span>
+              <span>กำลังโหลด...</span>
+            } @else {
+              <span>ล้างคิว</span>
+            }
+          </button>
+        </div>
+
+        <div class="center-section">
+          <div class="queue-label">หมายเลขคิวปัจจุบัน</div>
+          <div class="queue-code-display">{{ currentQueueCode() }}</div>
+        </div>
+
+        <div class="bottom-section">
+          <button 
+            type="button" 
+            class="btn btn-primary btn-action-back" 
+            (click)="goToScreen1()">
+            กลับไปหน้ารับบัตรคิว
+          </button>
+        </div>
+      </div>
+    }
   </div>
 </div>

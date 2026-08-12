@@ -1,5 +1,4 @@
-import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
-
+import { Component, signal, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 export interface QueueGenerateResponse {
@@ -13,28 +12,55 @@ export interface QueueResetResponse {
   currentIndex: number;
 }
 
+export interface QueueCurrentResponse {
+  queueCode: string;
+  currentIndex: number;
+  lastActive?: string;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [],
   templateUrl: './app.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   private readonly http = inject(HttpClient);
 
-  // API base URL endpoint
+  // API base endpoint
   private readonly apiUrl = '/api/queue';
 
-  // State managed via Angular Signals
+  // Screen Signals (1: IT 05-1, 2: IT 05-2, 3: IT 05-3)
   readonly currentScreen = signal<1 | 2 | 3>(1);
   readonly queueCode = signal<string>('');
+  readonly currentQueueCode = signal<string>('00');
+  readonly formattedDate = signal<string>('');
+  readonly formattedTime = signal<string>('');
   readonly isLoading = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
 
+  ngOnInit(): void {
+    this.fetchCurrentQueue();
+  }
+
   /**
-   * Action for Screen 1: Generate next queue ticket code (POST /api/queue/generate)
+   * Fetches the current active queue status from backend
+   */
+  fetchCurrentQueue(): void {
+    this.http.get<QueueCurrentResponse>(`${this.apiUrl}/current`).subscribe({
+      next: (res) => {
+        this.currentQueueCode.set(res.queueCode || '00');
+      },
+      error: (err) => {
+        console.error('Failed to fetch current queue status:', err);
+      }
+    });
+  }
+
+  /**
+   * Action for Screen 1: Generate next queue ticket (POST /api/queue/generate)
    */
   generateQueue(): void {
     this.isLoading.set(true);
@@ -43,19 +69,40 @@ export class AppComponent {
     this.http.post<QueueGenerateResponse>(`${this.apiUrl}/generate`, {}).subscribe({
       next: (response) => {
         this.queueCode.set(response.queueCode);
+        this.currentQueueCode.set(response.queueCode);
+
+        // Format Date and Time in Thai format: วันที่ : DD/MM/YYYY เวลา HH:mm น.
+        const d = response.generatedAt ? new Date(response.generatedAt) : new Date();
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+
+        this.formattedDate.set(`${day}/${month}/${year}`);
+        this.formattedTime.set(`${hours}:${minutes}`);
+
         this.currentScreen.set(2);
         this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Failed to generate queue:', err);
-        this.errorMessage.set('An error occurred. Unable to generate queue ticket.');
+        this.errorMessage.set('เกิดข้อผิดพลาด ไม่สามารถรับบัตรคิวได้');
         this.isLoading.set(false);
       }
     });
   }
 
   /**
-   * Action for Screen 1: Reset queue sequence (POST /api/queue/reset)
+   * Navigate to Screen 3 (IT 05-3)
+   */
+  goToScreen3(): void {
+    this.fetchCurrentQueue();
+    this.currentScreen.set(3);
+  }
+
+  /**
+   * Action for Screen 3: Reset queue sequence (POST /api/queue/reset)
    */
   resetQueue(): void {
     this.isLoading.set(true);
@@ -63,23 +110,22 @@ export class AppComponent {
 
     this.http.post<QueueResetResponse>(`${this.apiUrl}/reset`, {}).subscribe({
       next: () => {
-        this.queueCode.set('');
-        this.currentScreen.set(3);
+        this.queueCode.set('00');
+        this.currentQueueCode.set('00');
         this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Failed to reset queue:', err);
-        this.errorMessage.set('An error occurred. Unable to reset queue.');
+        this.errorMessage.set('เกิดข้อผิดพลาด ไม่สามารถล้างคิวได้');
         this.isLoading.set(false);
       }
     });
   }
 
   /**
-   * Action for Screen 2 & 3: Navigate back to main ticket screen (Screen 1)
+   * Action for Screen 2 & 3: Return to Main Ticket Screen (Screen 1 / IT 05-1)
    */
   goToScreen1(): void {
-    this.queueCode.set('');
     this.errorMessage.set(null);
     this.currentScreen.set(1);
   }

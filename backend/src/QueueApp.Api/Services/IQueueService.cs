@@ -6,5 +6,7 @@ public interface IQueueService
 {
     Task<QueueGenerateResponse> GenerateNextQueueAsync(CancellationToken cancellationToken = default);
     Task<QueueResetResponse> ResetQueueAsync(CancellationToken cancellationToken = default);
+    Task<QueueCurrentResponse> GetCurrentQueueAsync(CancellationToken cancellationToken = default);
     string IndexToQueueCode(int index);
 }
+
