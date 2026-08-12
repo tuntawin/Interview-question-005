@@ -25,5 +25,14 @@ public static class QueueEndpoints
         .WithName("ResetQueue")
         .WithSummary("Reset Queue Index")
         .WithDescription("Resets the queue sequence back to index -1.");
+
+        group.MapGet("/current", async (IQueueService queueService, CancellationToken cancellationToken) =>
+        {
+            var result = await queueService.GetCurrentQueueAsync(cancellationToken);
+            return Results.Ok(result);
+        })
+        .WithName("GetCurrentQueue")
+        .WithSummary("Get Current Queue Ticket")
+        .WithDescription("Gets the current active queue ticket code or 00 if reset.");
     }
 }

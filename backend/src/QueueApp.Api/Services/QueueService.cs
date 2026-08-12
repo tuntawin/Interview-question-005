@@ -112,4 +112,19 @@ public class QueueService : IQueueService
             _semaphore.Release();
         }
     }
+
+    public async Task<QueueCurrentResponse> GetCurrentQueueAsync(CancellationToken cancellationToken = default)
+    {
+        var setting = await _dbContext.QueueSettings
+            .FirstOrDefaultAsync(s => s.Id == 1, cancellationToken);
+
+        if (setting == null || setting.CurrentIndex < 0)
+        {
+            return new QueueCurrentResponse("00", -1, setting?.LastActive);
+        }
+
+        string queueCode = IndexToQueueCode(setting.CurrentIndex);
+        return new QueueCurrentResponse(queueCode, setting.CurrentIndex, setting.LastActive);
+    }
 }
+
