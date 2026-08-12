@@ -1,0 +1,78 @@
+<div class="page-container">
+  <div class="card">
+    <!-- Top green border bar (Border Top ~15px) -->
+    <div class="card-top-bar"></div>
+
+    <div class="card-content">
+      @if (errorMessage()) {
+        <div class="error-banner">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (currentScreen() === 1) {
+        <!-- Screen 1 (IT 05-1): Main Queue Ticket Generation Screen -->
+        <div class="screen screen-1">
+          <div class="center-section">
+            <button 
+              type="button" 
+              class="btn btn-primary btn-large" 
+              [disabled]="isLoading()" 
+              (click)="generateQueue()">
+              @if (isLoading()) {
+                <span class="spinner"></span>
+                <span>Loading...</span>
+              } @else {
+                <span>Get Ticket</span>
+              }
+            </button>
+          </div>
+
+          <div class="bottom-section">
+            <button 
+              type="button" 
+              class="btn btn-secondary btn-small" 
+              [disabled]="isLoading()" 
+              (click)="resetQueue()">
+              Reset Queue
+            </button>
+          </div>
+        </div>
+      } @else if (currentScreen() === 2) {
+        <!-- Screen 2 (IT 05-2): Queue Ticket Number Display Screen -->
+        <div class="screen screen-2">
+          <div class="center-section">
+            <p class="queue-label">Queue Number</p>
+            <h1 class="queue-code-display">{{ queueCode() }}</h1>
+          </div>
+
+          <div class="bottom-section">
+            <button 
+              type="button" 
+              class="btn btn-outline" 
+              (click)="goToScreen1()">
+              Back to Main Screen
+            </button>
+          </div>
+        </div>
+      } @else if (currentScreen() === 3) {
+        <!-- Screen 3 (IT 05-3): Queue Reset Confirmation Screen -->
+        <div class="screen screen-3">
+          <div class="center-section">
+            <p class="queue-label">Current Queue Number</p>
+            <h1 class="queue-code-muted">00</h1>
+          </div>
+
+          <div class="bottom-section">
+            <button 
+              type="button" 
+              class="btn btn-outline" 
+              (click)="goToScreen1()">
+              Back to Main Screen
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
