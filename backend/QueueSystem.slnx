@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/QueueApp.Api/QueueApp.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/QueueApp.Tests/QueueApp.Tests.csproj" />
+  </Folder>
+</Solution>

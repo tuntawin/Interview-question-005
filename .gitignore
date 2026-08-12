@@ -1,0 +1,45 @@
+# Operating System files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE & Editor configuration
+.idea/
+.vscode/
+*.swp
+*.swo
+*.user
+*.userosscache
+*.sln.docstates
+
+# .NET / C# Build Outputs
+bin/
+obj/
+[Bb]uild/
+[Tt]est[Rr]esult*/
+[Bb]uild[Lld]og.*/
+*.userprefs
+*.suo
+*.cache
+*.pdb
+
+# Database files
+*.db
+*.db-wal
+*.db-shm
+
+# Node.js & Angular Frontend
+node_modules/
+.angular/
+dist/
+.npm/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment & Local configurations
+.env
+.env.local
+.env.*.local
+appsettings.Local.json
