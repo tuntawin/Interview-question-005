@@ -1,4 +1,3 @@
-using System.Data;
 using Microsoft.EntityFrameworkCore;
 using QueueApp.Api.Data;
 using QueueApp.Api.Models;
@@ -32,10 +31,6 @@ public class QueueService : IQueueService
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            await using var transaction = _dbContext.Database.IsRelational()
-                ? await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken)
-                : null;
-
             var setting = await _dbContext.QueueSettings
                 .FirstOrDefaultAsync(s => s.Id == 1, cancellationToken);
 
@@ -48,7 +43,6 @@ public class QueueService : IQueueService
                     LastActive = DateTime.UtcNow
                 };
                 _dbContext.QueueSettings.Add(setting);
-                await _dbContext.SaveChangesAsync(cancellationToken);
             }
 
             int nextIndex = (setting.CurrentIndex < 0 || setting.CurrentIndex >= 259) ? 0 : setting.CurrentIndex + 1;
@@ -58,10 +52,6 @@ public class QueueService : IQueueService
             setting.LastActive = DateTime.UtcNow;
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-            if (transaction != null)
-            {
-                await transaction.CommitAsync(cancellationToken);
-            }
 
             return new QueueGenerateResponse(queueCode, nextIndex, setting.LastActive);
         }
@@ -76,10 +66,6 @@ public class QueueService : IQueueService
         await _semaphore.WaitAsync(cancellationToken);
         try
         {
-            await using var transaction = _dbContext.Database.IsRelational()
-                ? await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken)
-                : null;
-
             var setting = await _dbContext.QueueSettings
                 .FirstOrDefaultAsync(s => s.Id == 1, cancellationToken);
 
@@ -100,10 +86,6 @@ public class QueueService : IQueueService
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-            if (transaction != null)
-            {
-                await transaction.CommitAsync(cancellationToken);
-            }
 
             return new QueueResetResponse("Queue has been reset successfully.", -1);
         }
@@ -127,4 +109,3 @@ public class QueueService : IQueueService
         return new QueueCurrentResponse(queueCode, setting.CurrentIndex, setting.LastActive);
     }
 }
-
